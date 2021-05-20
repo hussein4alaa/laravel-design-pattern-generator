@@ -146,7 +146,13 @@ class ".$name."Controller extends Controller
             'take' => 'integer',
             'skip' => 'integer',
         ]);
-        return $index(##request->take, ##request->skip);
+        if(##request->has('where')) {
+            ##where = json_decode(##request->where, true);
+        } else {
+            ##where = null;
+        }
+
+        return $index(##request->take, ##request->skip, ##where);
     }
 
 
