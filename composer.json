@@ -16,7 +16,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "g4t\\laravel-design-pattern\\PatternServiceProvider"
+                "src\\PatternServiceProvider"
             ]
         }
     }
