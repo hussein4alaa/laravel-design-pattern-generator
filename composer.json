@@ -12,6 +12,13 @@
             "email": "hussein4alaa@gmail.com"
         }
     ],
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "src\\PatternServiceProvider"
+            ]
+        }
+    }
 }
 
