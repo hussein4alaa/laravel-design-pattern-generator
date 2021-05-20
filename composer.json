@@ -19,7 +19,7 @@
                 "laravel/dusk"
             ],    
             "providers": [
-                "g4t\\Pattern\\PatternServiceProvider"
+                "g4t\\laravel-design-pattern\\PatternServiceProvider"
             ]
         }
     }
