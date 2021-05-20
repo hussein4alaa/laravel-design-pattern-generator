@@ -7,8 +7,6 @@ use Illuminate\Http\Testing\File;
 
 class GenerateRepo extends Command
 {
-    public $domainRepositoryContract =
-        __DIR__.'/Repositories/TemplateRepository';
 
     /**
      * The name and signature of the console command.
@@ -255,7 +253,7 @@ public function jsonapi($name)
     $filename = config_path('jsonapi.php');
     $lines = file( $filename , FILE_IGNORE_NEW_LINES );
     $line = array_search('//dont-remove-or-edit-this-line',$lines,true);
-    $lines[$line-1] = "        '".strtolower($name)."' => [\n            'allowedSorts' => [],\n            'allowedFilters' => [],\n            'allowedIncludes' => [],\n        ],\n\n\n";
+    $lines[$line-1] = "        '".strtolower($name)."' => [\n            'allowedSorts' => ['column'],\n            'allowedFilters' => ['column'],\n            'allowedIncludes' => [''],\n        ],\n\n\n";
     file_put_contents( $filename , implode( "\n", $lines ) );
 }
 
