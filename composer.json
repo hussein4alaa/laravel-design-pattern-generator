@@ -17,9 +17,6 @@
         "laravel": {
             "dont-discover": [
                 "laravel/dusk"
-            ],    
-            "providers": [
-                "g4t\\laravel-design-pattern\\PatternServiceProvider"
             ]
         }
     }
