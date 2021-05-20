@@ -64,6 +64,18 @@ SORTING A QUERY BASED ON A REQUEST
 /users?sort=-id
 ```
 
+
+TAKE DATA
+```sh
+/users?take=10
+```
+
+
+SKIP DATA
+```sh
+/users?skip=10
+```
+
 ### License
 
 The Laravel Uploader is free software licensed under the MIT license.
