@@ -1,0 +1,24 @@
+{
+    "name": "g4t/laravel-design-pattern",
+    "description": "g4t laravel design pattern (repository design pattern With some improvements)",
+    "type": "library",
+    "require": {
+        "spatie/laravel-query-builder": "^3.4"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "hussein4alaa",
+            "email": "hussein4alaa@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "g4t\\Pattern\\PatternServiceProvider"
+            ]
+        }
+    }
+}
+
