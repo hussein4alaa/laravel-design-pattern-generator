@@ -13,6 +13,11 @@
         }
     ],
     "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "g4t\\Pattern\\": "src/"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
