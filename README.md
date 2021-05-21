@@ -78,7 +78,7 @@ SKIP DATA
 
 CUSTOM CONDITIONS
 ```sh
-/users?where={ column: "parent_to", condition: "=", value: "0" }
+/users?where={"column":"parent_to","condition":"!=", "value":"0"}
 ```
 
 
