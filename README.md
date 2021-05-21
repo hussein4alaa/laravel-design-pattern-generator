@@ -87,4 +87,4 @@ CUSTOM CONDITIONS
 
 ### License
 
-The Laravel Uploader is free software licensed under the MIT license.
+Laravel Design Pattern Generator is free software licensed under the MIT license.
