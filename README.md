@@ -37,9 +37,12 @@ $ php artisan make:repo User --c --r --model=User
 Command | Description
 --------- | -------
 `--c` | Create Controller and linked with repository
-`--r` | Create apiResource Route in api.php
 `--m` | Create Model and linked with Controller Functions
+`--model={ModelName}` | Insert model in controller if you have model
+`--r` | Create apiResource Route in api.php
 `--force` | override existing Repository
+
+
 
 
 ### Parameters to controlling data:
