@@ -249,7 +249,14 @@ public function route($name)
         fwrite($f, $lines[$i]);
     }
     
-    fwrite($f, "Route::apiResource('".strtolower($name)."', '$controller');".PHP_EOL);
+    $laravel = app();
+    $version = $laravel::VERSION;
+    if($version >= 8) {
+        $route_8 = 'App\Http\Controllers\\'.$controller.'::class';
+        fwrite($f, "Route::apiResource('".strtolower($name)."', $route_8);".PHP_EOL);
+    } else {
+        fwrite($f, "Route::apiResource('".strtolower($name)."', '$controller');".PHP_EOL);
+    }
     fwrite($f, $lines[$lineCount-1]);
     fclose($f);    
 }
