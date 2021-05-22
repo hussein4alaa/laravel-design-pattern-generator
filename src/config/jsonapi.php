@@ -1,6 +1,9 @@
 <?php
 return [
     'resources' => [
+
+
+// user options
         'user' => [
             'allowedSorts' => [
               'id',

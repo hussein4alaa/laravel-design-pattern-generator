@@ -33,6 +33,11 @@ class GenerateRepo extends Command
      *
      * @return void
      */
+    protected $controller = __DIR__ . '/stubs/controller.stub';
+    protected $model = __DIR__ . '/stubs/model.stub';
+    protected $jsonapi = __DIR__ . '/stubs/jsonapi.stub';
+    protected $repository = __DIR__ . '/stubs/repository.stub';
+
     public function __construct()
     {
         parent::__construct();
@@ -47,20 +52,20 @@ class GenerateRepo extends Command
     {
         $path = 'app/Http/Repositories';
         $name = $this->argument('name');
-        $file = $path.'/'.$name.'Repository.php';
+        $file = $path . '/' . $name . 'Repository.php';
 
 
-        if(!is_dir($path)) {
+        if (!is_dir($path)) {
             mkdir($path, 0777);
         }
 
-        if(!$this->option('force') and file_exists($file)) {
-            return $this->comment($name.'Repository exists. Use --force to override');
+        if (!$this->option('force') and file_exists($file)) {
+            return $this->comment($name . 'Repository exists. Use --force to override');
         }
 
-        if($this->option('model')) {
+        if ($this->option('model')) {
             $model = $this->option('model');
-        } else if($this->option('m')) {
+        } else if ($this->option('m')) {
             $model = ucfirst($name);
             $this->model($name);
             $return[] = 'Model';
@@ -78,197 +83,103 @@ class GenerateRepo extends Command
             $return[] = 'Route';
         }
 
-        
-        
+
+
         $this->Repo($name, $file);
         $this->jsonapi($name);
 
         $return[] = 'Repostitory';
         $data = implode(", ", $return);
 
-        return $this->comment($name.' ('.$data.') Created.');
+        return $this->comment($name . ' (' . $data . ') Created.');
     }
 
 
-public function Repo($name, $file)
-{
-$myfile = fopen($file, "w") or die("Unable to open file!");
-$txt = "<?php
-namespace App\Http\Repositories;
-use g4t\Pattern\Repositories\BaseRepository;
-
-class {$name}Repository extends BaseRepository {
-
-}
-";
-fwrite($myfile, $txt);
-fclose($myfile);
-}
-
-
-
-public function Controller($name, $model)
-{
-if(!$model) {
-    $model = "ModelHere";
-}
-$const = '$this->'.$name.'Repository';
-$index = '$this->'.$name.'Repository->index';
-$show = '$this->'.$name.'Repository->show';
-$store = '$this->'.$name.'Repository->store';
-$update = '$this->'.$name.'Repository->update';
-$destroy = '$this->'.$name.'Repository->destroy';
-$path = 'app\Http\Controllers\\'.$name.'Controller.php';
-$myfile = fopen($path, "w") or die("Unable to open file!");
-$txt = "<?php
-namespace App\Http\Controllers;
-use Illuminate\Http\Request;
-use App\Http\Repositories\\".$name."Repository;
-use App\\".$model.";
-class ".$name."Controller extends Controller
-{
-    private $".$name."Repository;
-    public function __construct()
+    public function Repo($name, $file)
     {
-        $const = new ".$name."Repository(new ".$model."());
+        $myfile = fopen($file, "w") or die("Unable to open file!");
+        $file = file_get_contents($this->repository);
+        $text = "<?php\n";
+        fwrite($myfile, $text);
+        $result = str_replace('{{name}}', $name, $file);
+        fwrite($myfile, $result);
+        fclose($myfile);
     }
 
 
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Request ##request)
+    public function Controller($name, $model)
     {
-        ##request->validate([
-            'take' => 'integer',
-            'skip' => 'integer',
-        ]);
-        if(##request->has('where')) {
-            ##where = json_decode(##request->where, true);
-        } else {
-            ##where = null;
+        if (!$model) {
+            $model = "ModelHere";
+        }
+        $path = 'app\Http\Controllers\\' . $name . 'Controller.php';
+        $myfile = fopen($path, "w") or die("Unable to open file!");
+        $file = file_get_contents($this->controller);
+        $text = "<?php\n";
+        fwrite($myfile, $text);
+        $result = str_replace('{{name}}', $name, $file);
+        $result = str_replace('{{model}}', $model, $result);
+        fwrite($myfile, $result);
+        fclose($myfile);
+    }
+
+
+
+    public function model($name)
+    {
+        $path = 'app/' . $name . '.php';
+        $myfile = fopen($path, "w") or die("Unable to open file!");
+        $file = file_get_contents($this->model);
+        $text = "<?php\n";
+        fwrite($myfile, $text);
+        $result = str_replace('{{name}}', $name, $file);
+        fwrite($myfile, $result);
+        fclose($myfile);
+    }
+
+
+
+    public function route($name)
+    {
+        $controller = $name . 'Controller';
+        $file = "routes/api.php";
+        $fc = fopen($file, "r");
+        while (!feof($fc)) {
+            $buffer = fgets($fc, 4096);
+            $lines[] = $buffer;
+        }
+        fclose($fc);
+        $f = fopen($file, "w") or die("couldn't open $file");
+        $lineCount = count($lines);
+        for ($i = 0; $i < $lineCount - 1; $i++) {
+            fwrite($f, $lines[$i]);
         }
 
-        return $index(##request->take, ##request->skip, ##where);
+        $laravel = app();
+        $version = $laravel::VERSION;
+        if ($version >= 8) {
+            $route_8 = 'App\Http\Controllers\\' . $controller . '::class';
+            fwrite($f, "Route::apiResource('" . strtolower($name) . "', $route_8);" . PHP_EOL);
+        } else {
+            fwrite($f, "Route::apiResource('" . strtolower($name) . "', '$controller');" . PHP_EOL);
+        }
+        fwrite($f, $lines[$lineCount - 1]);
+        fclose($f);
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  ##request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request ##request)
+    public function jsonapi($name)
     {
-        return $store(##request->all());
+        $include = include(config_path('jsonapi.php'));
+        if (!array_key_exists(strtolower($name), $include['resources'])) {
+            $file = file_get_contents($this->jsonapi);
+            $result = str_replace('{{name}}', strtolower($name), $file);
+
+            $filename = config_path('jsonapi.php');
+            $lines = file($filename, FILE_IGNORE_NEW_LINES);
+            $line = array_search('//dont-remove-or-edit-this-line', $lines, true);
+            $lines[$line - 1] = $result;
+            file_put_contents($filename, implode("\n", $lines));
+        }
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\\$name  ##$name
-     * @return \Illuminate\Http\Response
-     */
-    public function show(##id)
-    {
-        return $show(##id);
-    }
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  ##request
-     * @param  \App\\$name  ##$name
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request ##request, ##id)
-    {
-        return $update(##id, ##request->all());
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\\$name  ##$name
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(##id)
-    {
-        return $destroy(##id);
-    }
-
-}
-";
-$result = str_replace("##","$",$txt);
-
-fwrite($myfile, $result);
-fclose($myfile);
-}
-
-
-
-public function model($name)
-{
-$path = 'app/'.$name.'.php';
-$myfile = fopen($path, "w") or die("Unable to open file!");
-$txt = "<?php
-
-namespace App;
-
-use Illuminate\Database\Eloquent\Model;
-
-class $name extends Model
-{
-
-}
-";
-fwrite($myfile, $txt);
-fclose($myfile);
-}
-
-
-
-public function route($name)
-{
-    $controller = $name.'Controller';
-    $file = "routes/api.php";
-    $fc = fopen($file, "r");
-    while (!feof($fc)) {
-        $buffer = fgets($fc, 4096);
-        $lines[] = $buffer;
-    }
-    fclose($fc);
-    $f = fopen($file, "w") or die("couldn't open $file");
-    $lineCount = count($lines);
-    for ($i = 0; $i < $lineCount- 1; $i++) {
-        fwrite($f, $lines[$i]);
-    }
-    
-    $laravel = app();
-    $version = $laravel::VERSION;
-    if($version >= 8) {
-        $route_8 = 'App\Http\Controllers\\'.$controller.'::class';
-        fwrite($f, "Route::apiResource('".strtolower($name)."', $route_8);".PHP_EOL);
-    } else {
-        fwrite($f, "Route::apiResource('".strtolower($name)."', '$controller');".PHP_EOL);
-    }
-    fwrite($f, $lines[$lineCount-1]);
-    fclose($f);    
-}
-
-public function jsonapi($name)
-{
-    $filename = config_path('jsonapi.php');
-    $lines = file( $filename , FILE_IGNORE_NEW_LINES );
-    $line = array_search('//dont-remove-or-edit-this-line',$lines,true);
-    $lines[$line-1] = "        '".strtolower($name)."' => [\n            'allowedSorts' => ['column'],\n            'allowedFilters' => ['column'],\n            'allowedIncludes' => [''],\n        ],\n\n\n";
-    file_put_contents( $filename , implode( "\n", $lines ) );
-}
-
-
 }
