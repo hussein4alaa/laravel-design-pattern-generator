@@ -22,7 +22,7 @@ abstract class BaseRepository
         return strtolower($name);
     }
 
-    public function index($take = null, $skip = 0, $where = null)
+    public function index($take = null, $skip = 0, $where = null, $wheres = [])
     {
         $data = QueryBuilder::for($this->table)
             ->allowedSorts(config("jsonapi.resources.{$this->getType()}.allowedSorts"))
@@ -30,6 +30,11 @@ abstract class BaseRepository
             ->allowedFilters(config("jsonapi.resources.{$this->getType()}.allowedFilters"));
             if($where) {
                 $data = $data->where($where['column'], $where['condition'], $where['value']);
+            }
+            if($wheres) {
+                foreach($wheres as $condition) {
+                    $data = $data->where($condition['column'], $condition['condition'], $condition['value']);
+                }
             }
         return [
             'total' => $data->count(),
