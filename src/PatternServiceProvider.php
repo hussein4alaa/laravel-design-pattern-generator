@@ -15,15 +15,25 @@ class PatternServiceProvider extends ServiceProvider
     public function register()
     {
         $this->publishes([
-            __DIR__.'/config/jsonapi.php' => base_path('config/jsonapi.php'),
+            __DIR__ . '/config/jsonapi.json' => base_path('config/jsonapi.json'),
         ]);
+
+        $this->publishes([
+            __DIR__ . '/Repositories/BaseRepository.php' => base_path('app/Http/Repositories/BaseRepository.php'),
+        ]);
+
+        $this->publishes([
+            __DIR__ . '/Helpers/Helpers.php' => base_path('app/Http/Repositories/Helpers.php'),
+        ]);
+
+
 
         if ($this->app->runningInConsole()) {
             $this->commands([
                 GenerateRepo::class,
+                GenerateValidation::class,
             ]);
         }
-
     }
 
     /**

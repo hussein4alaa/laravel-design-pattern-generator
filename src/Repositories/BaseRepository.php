@@ -1,12 +1,12 @@
 <?php
 
-namespace g4t\Pattern\Repositories;
+namespace App\Http\Repositories;
 
 use Spatie\QueryBuilder\QueryBuilder;
 
 use Illuminate\Database\Eloquent\Model;
 
-abstract class BaseRepository
+abstract class BaseRepository extends Helpers
 {
 
     public $table;
@@ -15,27 +15,13 @@ abstract class BaseRepository
         $this->table = $model;
     }
 
-    public function getType()
-    {
-        $className = get_class($this->table);
-        $name = class_basename($className);
-        return strtolower($name);
-    }
 
-    public function index($take = null, $skip = 0, $where = null, $wheres = [])
+    public function index($take = null, $skip = 0)
     {
         $data = QueryBuilder::for($this->table)
-            ->allowedSorts(config("jsonapi.resources.{$this->getType()}.allowedSorts"))
-            ->allowedIncludes(config("jsonapi.resources.{$this->getType()}.allowedIncludes"))
-            ->allowedFilters(config("jsonapi.resources.{$this->getType()}.allowedFilters"));
-            if($where) {
-                $data = $data->where($where['column'], $where['condition'], $where['value']);
-            }
-            if($wheres) {
-                foreach($wheres as $condition) {
-                    $data = $data->where($condition['column'], $condition['condition'], $condition['value']);
-                }
-            }
+            ->allowedSorts($this->sort())
+            ->allowedIncludes($this->include())
+            ->allowedFilters($this->filter());
         return [
             'total' => $data->count(),
             'items' => ($take == null) ? $data->get() : $data->take($take)->skip($skip)->get()
@@ -46,7 +32,7 @@ abstract class BaseRepository
     public function show($id)
     {
         $data = QueryBuilder::for($this->table)
-            ->allowedIncludes(config("jsonapi.resources.{$this->getType()}.allowedIncludes"))
+            ->allowedIncludes($this->include())
             ->findOrFail($id);
         return $data;
     }
@@ -76,5 +62,4 @@ abstract class BaseRepository
         $response = ['message' => '' . $this->getType() . '  Deleted', 'code' => 200];
         return $response;
     }
-
 }

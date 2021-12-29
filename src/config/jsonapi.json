@@ -1,0 +1,28 @@
+{
+    "resources": {
+        "user": {
+            "lock": true,
+            "allowedSorts": [
+                "id",
+                "name",
+                "email",
+                "email_verified_at",
+                "password",
+                "remember_token",
+                "created_at",
+                "updated_at"
+            ],
+            "allowedFilters": [
+                "id",
+                "name",
+                "email",
+                "email_verified_at",
+                "password",
+                "remember_token",
+                "created_at",
+                "updated_at"
+            ],
+            "allowedIncludes": []
+        }
+    }
+}

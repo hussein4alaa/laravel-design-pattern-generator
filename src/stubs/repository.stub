@@ -1,5 +1,5 @@
 namespace App\Http\Repositories;
-use g4t\Pattern\Repositories\BaseRepository;
+use g4t\Pattern\Repositories;
 
 class {{name}}Repository extends BaseRepository {
 
