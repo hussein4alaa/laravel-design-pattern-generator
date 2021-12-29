@@ -2,7 +2,7 @@
 ### you can create your restful api with validation easily by using this package
 ##### and you can filter, sort and include eloquent relations based on a request
 
-<img src="https://github.com/hussein4alaa/laravel-design-pattern-generator/blob/1.0.1/logo.png" alt="drawing" style="width:400px;"/>
+<img src="https://github.com/hussein4alaa/laravel-design-pattern-generator/blob/1.0.1/logo.png" style="width:400px;"/>
 
 
 ![me](https://github.com/hussein4alaa/laravel-design-pattern-generator/blob/main/image.gif)
