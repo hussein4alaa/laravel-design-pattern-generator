@@ -22,10 +22,8 @@ class LimitRequest extends FormRequest
     public function rules()
     {
         return [
-            'per_page' => 'nullable|integer',
             'take' => 'nullable|integer',
             'skip' => 'nullable|integer',
-            'where' => 'nullable|array'
         ];
     }
 }
