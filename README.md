@@ -5,7 +5,7 @@
 <img src="https://github.com/hussein4alaa/laravel-design-pattern-generator/blob/1.0.1/logo.png" style="width:400px;"/>
 
 
-![me](https://github.com/hussein4alaa/laravel-design-pattern-generator/blob/main/image.gif)
+![me](https://github.com/hussein4alaa/laravel-design-pattern-generator/blob/1.0.1/image.gif)
 
 ## Installation:
 Require this package with composer using the following command:
