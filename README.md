@@ -36,7 +36,7 @@ php artisan make:repo User --model=User
 
 ##### you can create validation from database table using this command 
 ```sh
-php artisan make:validation ModelNmae
+php artisan repo:validation ModelNmae
 ```
 
 
