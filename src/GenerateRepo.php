@@ -14,14 +14,11 @@ class GenerateRepo extends Repository
      *
      * @var string
      */
-    protected $signature = 'repo:model
-                        {name : Repo name}
-                        {--c : Create Controller With Repository}
-                        {--m : Create Model With Repository}
-                        {--r : Create apiResource Route}
-                        {--force : Allows to override existing Repository}
+    protected $signature = 'make:repo
+                        {name : Repository name}
+                        {--m : Create migration}
                         {--model= : Insert model in controller}
-                        {--table= : Insert table name to create migration}
+                        {--force : Allows to override existing Repository}
                         ';
     /**
      * The console command description.
@@ -54,6 +51,7 @@ class GenerateRepo extends Repository
      */
     public function handle()
     {
+        $response = [];
         $path = 'app/Http/Repositories';
         $name = $this->argument('name');
 
@@ -98,12 +96,10 @@ class GenerateRepo extends Repository
          */
         if ($this->option('model')) {
             $model = $this->option('model');
-        } else if ($this->option('m')) {
+        } else {
             $model = ucfirst($name);
             $this->model($name);
-            $return[] = 'Model';
-        } else {
-            $model = null;
+            array_push($response, 'Model');
         }
 
 
@@ -112,10 +108,8 @@ class GenerateRepo extends Repository
          *
          * @return string
          */
-        if ($this->option('c')) {
             $this->Controller($name, $model);
-            $return[] = 'Controller';
-        }
+            array_push($response, 'Controller');
 
 
         /**
@@ -123,10 +117,8 @@ class GenerateRepo extends Repository
          *
          * @return string
          */
-        if ($this->option('r')) {
             $this->route($name);
-            $return[] = 'Route';
-        }
+            array_push($response, 'Route');
 
 
         /**
@@ -135,6 +127,7 @@ class GenerateRepo extends Repository
          * @return string
          */
         $this->Repo($name, $file);
+        array_push($response, 'Repostitory');
 
         /**
          * Create 'jsonapi' file
@@ -143,14 +136,12 @@ class GenerateRepo extends Repository
          */
         $this->jsonapi($name);
 
-        $return[] = 'Repostitory';
-
         /**
          * Convert 'return' To string
          *
          * @return string
          */
-        $data = implode(", ", $return);
+        $data = implode(", ", $response);
 
         /**
          * response message

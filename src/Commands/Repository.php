@@ -4,6 +4,7 @@ namespace g4t\Pattern\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 
 class Repository extends Command
 {
@@ -13,10 +14,11 @@ class Repository extends Command
      *
      * @return string
      */
-    public function migration($table)
+    public function migration($model)
     {
         try {
-            Artisan::call('make:migration create_' . strtolower($table) . '_table');
+            $model = Str::plural($model);
+            Artisan::call('make:migration create_' . strtolower($model) . '_table');
             $return[] = 'Migration';
         } catch (\Throwable $th) {
         }
