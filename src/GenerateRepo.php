@@ -1,199 +1,153 @@
 <?php
 
-namespace g4t\Pattern\Commands;
+namespace g4t\Pattern;
 
-use Illuminate\Console\Command;
+use g4t\Pattern\Commands\Repository;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
 
-class Repository extends Command
+class GenerateRepo extends Repository
 {
 
-    public function migration($table)
-    {
-        try {
-            Artisan::call('make:migration create_'.strtolower($table).'_table');
-            $return[] = 'Migration';
-        } catch (\Throwable $th) {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'repo:name
+                        {name : Repository name}
+                        {--m : Create migration}
+                        {--model= : Insert model in controller}
+                        {--force : Allows to override existing Repository}
+                        ';
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create repository';
 
-        }
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    protected $controller = __DIR__ . '/stubs/controller.stub';
+    protected $model = __DIR__ . '/stubs/model.stub';
+    protected $jsonapi = __DIR__ . '/stubs/jsonapi.stub';
+    protected $repository = __DIR__ . '/stubs/repository.stub';
+    protected $request = __DIR__ . '/stubs/request.stub';
+    protected $limitRequest = __DIR__ . '/stubs/limitRequest.stub';
+
+    public function __construct()
+    {
+        parent::__construct();
     }
 
-
-    public function model($name)
+    /**
+     * Execute the console command.
+     *
+     * @return int
+     */
+    public function handle()
     {
-        $laravel = app();
-        $version = $laravel::VERSION;
-        if ($version >= 8) {
-            $namespace = 'App\\Models';
-        } else {
-            $namespace = 'App';
-        }
-        $namespace = 'App\\Models';
-        $path = 'app/' . $name . '.php';
-        $myfile = fopen($path, "w") or die("Unable to open file!");
-        $file = file_get_contents($this->model);
-        $text = "<?php\n";
-        fwrite($myfile, $text);
-        $result = str_replace('{{name}}', $name, $file);
-        $result = str_replace('{{namespace}}', $namespace, $result);
-        fwrite($myfile, $result);
-        fclose($myfile);
-    }
+        $response = [];
+        $path = 'app/Http/Repositories';
+        $name = $this->argument('name');
 
+        /**
+         * conver model name to plural.
+         *
+         * @return string
+         */
+        $table = Str::plural($name);
 
+        /**
+         * make migration.
+         *
+         * @return string
+         */
+        $return[] = $this->migration($table);
 
-    public function Controller($name, $model)
-    {
-        if (!$model) {
-            $model = "ModelHere";
-        }
-        $laravel = app();
-        $version = $laravel::VERSION;
-        if ($version >= 8) {
-            $model_namespace = 'App\\Models\\'.$model;
-        } else {
-            $model_namespace = 'App\\'.$model;
-        }
-        $path = 'app\Http\Controllers\\' . $name . 'Controller.php';
-        $myfile = fopen($path, "w") or die("Unable to open file!");
-        $file = file_get_contents($this->controller);
-        $text = "<?php\n";
-        fwrite($myfile, $text);
-        $result = str_replace('{{name}}', $name, $file);
-        $result = str_replace('{{model}}', $model_namespace, $result);
-        fwrite($myfile, $result);
-        fclose($myfile);
-        $this->Request($name);
-    }
+        $file = $path . '/' . $name . 'Repository.php';
 
-
-
-
-    public function route($name)
-    {
-        $controller = $name . 'Controller';
-        $file = "routes/api.php";
-        $fc = fopen($file, "r");
-        while (!feof($fc)) {
-            $buffer = fgets($fc, 4096);
-            $lines[] = $buffer;
-        }
-        fclose($fc);
-        $f = fopen($file, "w") or die("couldn't open $file");
-        $lineCount = count($lines);
-        for ($i = 0; $i < $lineCount - 1; $i++) {
-            fwrite($f, $lines[$i]);
-        }
-
-        $laravel = app();
-        $version = $laravel::VERSION;
-        if ($version >= 8) {
-            $route_8 = 'App\Http\Controllers\\' . $controller . '::class';
-            fwrite($f, "Route::apiResource('" . strtolower($name) . "', $route_8);" . PHP_EOL);
-        } else {
-            fwrite($f, "Route::apiResource('" . strtolower($name) . "', '$controller');" . PHP_EOL);
-        }
-        fwrite($f, $lines[$lineCount - 1]);
-        fclose($f);
-    }
-
-
-
-
-
-    public function Repo($name, $file)
-    {
-        $myfile = fopen($file, "w") or die("Unable to open file!");
-        $file = file_get_contents($this->repository);
-        $text = "<?php\n";
-        fwrite($myfile, $text);
-        $result = str_replace('{{name}}', $name, $file);
-        fwrite($myfile, $result);
-        fclose($myfile);
-    }
-
-
-
-    public function jsonapi($resource)
-    {
-        $resource = strtolower($resource);
-        $rootDir = realpath($_SERVER["DOCUMENT_ROOT"]);
-        $path = "$rootDir/config/repo-settings.json";
-        $json_object = file_get_contents($path);
-        $data = json_decode($json_object, true);
-
-        $data['resources'][$resource]['lock'] = false;
-        $data['resources'][$resource]['allowedSorts'] = [];
-        $data['resources'][$resource]['allowedFilters'] = [];
-        $data['resources'][$resource]['allowedIncludes'] = [];
-        $data = json_encode($data, JSON_PRETTY_PRINT);
-        file_put_contents($path, $data);
-    }
-
-
-
-
-
-
-    public function Request($name)
-    {
-        $this->createLimitRequest();
-        $path = 'app/Http/Requests/'.$name;
-
+        /**
+         * check if path exists.
+         * create path
+         */
         if (!is_dir($path)) {
             mkdir($path, 0777);
         }
-        $create = $path. '/Create'. $name .'.php';
-        $update = $path. '/Update'. $name .'.php';
-        $this->createRequest($create, 'Create'. $name, $name);
-        $this->createRequest($update, 'Update'. $name, $name);
-    }
 
+        /**
+         * force create.
+         *
+         * @return string
+         */
+        if (!$this->option('force') and file_exists($file)) {
+            return $this->comment($name . 'Repository exists. Use --force to override');
+        }
 
-    public function createRequest($path, $name, $shortname)
-    {
-        $myfile = fopen($path, "w") or die("Unable to open file!");
-        $file = file_get_contents($this->request);
-        $text = "<?php\n";
-        fwrite($myfile, $text);
-        $result = str_replace('{{name}}', $name, $file);
-        $result = str_replace('{{shortname}}', $shortname, $result);
-        fwrite($myfile, $result);
-        fclose($myfile);
-    }
-
-
-    public function createLimitRequest()
-    {
-        $path = 'app/Http/Requests/LimitRequest.php';
-        $create = null;
-
-        if(!is_dir('app/Http/Requests')) {
-            mkdir('app/Http/Requests', 0777);
-            if(!file_exists($path)) {
-                $create = 'ok';
-            }
+        /**
+         * conver model name to plural.
+         * create model
+         *
+         * @return string
+         */
+        if ($this->option('model')) {
+            $model = $this->option('model');
         } else {
-            if(!file_exists($path)) {
-                $create = 'ok';
-            }
+            $model = ucfirst($name);
+            $this->model($name);
+            array_push($response, 'Model');
         }
 
-        if(!is_null($create)) {
-            $myfile = fopen($path, "w") or die("Unable to open file!");
-            $file = file_get_contents($this->limitRequest);
-            $text = "<?php\n";
-            fwrite($myfile, $text);
-            fwrite($myfile, $file);
-            fclose($myfile);
-        }
+
+        /**
+         *create controller
+         *
+         * @return string
+         */
+            $this->Controller($name, $model);
+            array_push($response, 'Controller');
+
+
+        /**
+         *Add Api Route
+         *
+         * @return string
+         */
+            $this->route($name);
+            array_push($response, 'Route');
+
+
+        /**
+         * Create Repository
+         *
+         * @return string
+         */
+        $this->Repo($name, $file);
+        array_push($response, 'Repostitory');
+
+        /**
+         * Create 'jsonapi' file
+         *
+         * @return string
+         */
+        $this->jsonapi($name);
+
+        /**
+         * Convert 'return' To string
+         *
+         * @return string
+         */
+        $data = implode(", ", $response);
+
+        /**
+         * response message
+         *
+         * @return string
+         */
+        return $this->comment($name . ' (' . $data . ') Created.');
     }
-
-
-
-
-
-    
-
 }
-
