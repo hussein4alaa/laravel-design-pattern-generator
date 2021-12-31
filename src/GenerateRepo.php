@@ -14,7 +14,7 @@ class GenerateRepo extends Repository
      *
      * @var string
      */
-    protected $signature = 'make:repo
+    protected $signature = 'repo:name
                         {name : Repository name}
                         {--m : Create migration}
                         {--model= : Insert model in controller}
