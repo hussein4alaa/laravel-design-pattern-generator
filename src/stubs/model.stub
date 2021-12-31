@@ -1,4 +1,4 @@
-namespace App;
+namespace {{namespace}};
 
 use Illuminate\Database\Eloquent\Model;
 

@@ -31,12 +31,21 @@ class Repository extends Command
      */
     public function model($name)
     {
-        $path = 'app/' . $name . '.php';
+        $laravel = app();
+        $version = $laravel::VERSION;
+        if ($version >= 8) {
+            $path = 'app/Models/' . $name . '.php';
+            $namespace = 'App\\Models';
+        } else {
+            $path = 'app/' . $name . '.php';
+            $namespace = 'App';
+        }
         $myfile = fopen($path, "w") or die("Unable to open file!");
         $file = file_get_contents($this->model);
         $text = "<?php\n";
         fwrite($myfile, $text);
         $result = str_replace('{{name}}', $name, $file);
+        $result = str_replace('{{namespace}}', $namespace, $result);
         fwrite($myfile, $result);
         fclose($myfile);
     }
@@ -52,6 +61,13 @@ class Repository extends Command
         if (!$model) {
             $model = "ModelHere";
         }
+        $laravel = app();
+        $version = $laravel::VERSION;
+        if ($version >= 8) {
+            $model_namespace = 'App\\Models\\'.$model;
+        } else {
+            $model_namespace = 'App\\'.$model;
+        }
         $path = 'app\Http\Controllers\\' . $name . 'Controller.php';
         $myfile = fopen($path, "w") or die("Unable to open file!");
         $file = file_get_contents($this->controller);
@@ -59,6 +75,7 @@ class Repository extends Command
         fwrite($myfile, $text);
         $result = str_replace('{{name}}', $name, $file);
         $result = str_replace('{{model}}', $model, $result);
+        $result = str_replace('{{model_namespace}}', $model_namespace, $result);
         fwrite($myfile, $result);
         fclose($myfile);
         $this->Request($name);

@@ -1,7 +1,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Repositories\{{name}}Repository;
-use App\{{name}};
+use {{model_namespace}};
 use App\Http\Requests\{{name}}\Create{{name}};
 use App\Http\Requests\{{name}}\Update{{name}};
 use App\Http\Requests\LimitRequest;
