@@ -4,41 +4,31 @@ namespace g4t\Pattern\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Str;
 
 class Repository extends Command
 {
 
-    /**
-     * generate migration
-     *
-     * @return string
-     */
-    public function migration($model)
+    public function migration($table)
     {
         try {
-            $model = Str::plural($model);
-            Artisan::call('make:migration create_' . strtolower($model) . '_table');
+            Artisan::call('make:migration create_'.strtolower($table).'_table');
             $return[] = 'Migration';
         } catch (\Throwable $th) {
+
         }
     }
 
-    /**
-     * generate model
-     *
-     * @return string
-     */
+
     public function model($name)
     {
         $laravel = app();
         $version = $laravel::VERSION;
         if ($version >= 8) {
-            $path = 'app/Models/' . $name . '.php';
             $namespace = 'App\\Models';
+            $path = 'app/Models/' . $name . '.php';
         } else {
-            $path = 'app/' . $name . '.php';
             $namespace = 'App';
+            $path = 'app/' . $name . '.php';
         }
         $myfile = fopen($path, "w") or die("Unable to open file!");
         $file = file_get_contents($this->model);
@@ -51,11 +41,7 @@ class Repository extends Command
     }
 
 
-    /**
-     * generate controller
-     *
-     * @return string
-     */
+
     public function Controller($name, $model)
     {
         if (!$model) {
@@ -83,11 +69,7 @@ class Repository extends Command
 
 
 
-    /**
-     * generate route
-     *
-     * @return string
-     */
+
     public function route($name)
     {
         $controller = $name . 'Controller';
@@ -119,11 +101,7 @@ class Repository extends Command
 
 
 
-    /**
-     * generate repository
-     *
-     * @return string
-     */
+
     public function Repo($name, $file)
     {
         $myfile = fopen($file, "w") or die("Unable to open file!");
@@ -136,11 +114,7 @@ class Repository extends Command
     }
 
 
-    /**
-     * generate json file
-     *
-     * @return string
-     */
+
     public function jsonapi($resource)
     {
         $resource = strtolower($resource);
@@ -159,31 +133,24 @@ class Repository extends Command
 
 
 
-    /**
-     * generate request
-     *
-     * @return null
-     */
+
+
+
     public function Request($name)
     {
         $this->createLimitRequest();
-        $path = 'app/Http/Requests/' . $name;
+        $path = 'app/Http/Requests/'.$name;
 
         if (!is_dir($path)) {
             mkdir($path, 0777);
         }
-        $create = $path . '/Create' . $name . '.php';
-        $update = $path . '/Update' . $name . '.php';
-        $this->createRequest($create, 'Create' . $name, $name);
-        $this->createRequest($update, 'Update' . $name, $name);
+        $create = $path. '/Create'. $name .'.php';
+        $update = $path. '/Update'. $name .'.php';
+        $this->createRequest($create, 'Create'. $name, $name);
+        $this->createRequest($update, 'Update'. $name, $name);
     }
 
 
-    /**
-     * generate create request validation
-     *
-     * @return null
-     */
     public function createRequest($path, $name, $shortname)
     {
         $myfile = fopen($path, "w") or die("Unable to open file!");
@@ -197,28 +164,23 @@ class Repository extends Command
     }
 
 
-    /**
-     * generate limit request validation
-     *
-     * @return null
-     */
     public function createLimitRequest()
     {
         $path = 'app/Http/Requests/LimitRequest.php';
         $create = null;
 
-        if (!is_dir('app/Http/Requests')) {
+        if(!is_dir('app/Http/Requests')) {
             mkdir('app/Http/Requests', 0777);
-            if (!file_exists($path)) {
+            if(!file_exists($path)) {
                 $create = 'ok';
             }
         } else {
-            if (!file_exists($path)) {
+            if(!file_exists($path)) {
                 $create = 'ok';
             }
         }
 
-        if (!is_null($create)) {
+        if(!is_null($create)) {
             $myfile = fopen($path, "w") or die("Unable to open file!");
             $file = file_get_contents($this->limitRequest);
             $text = "<?php\n";
@@ -227,4 +189,10 @@ class Repository extends Command
             fclose($myfile);
         }
     }
+
+
+
+
+
 }
+
