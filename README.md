@@ -26,11 +26,11 @@ php artisan vendor:publish --provider=g4t\Pattern\PatternServiceProvider
 ##### full command 
 ###### create (Model, Controller, Route And Repostitory)
 ```sh
-php artisan make:repo User
+php artisan repo:name User
 ```
 ##### or if you have model 
 ```sh
-php artisan make:repo User --model=User
+php artisan repo:name User --model=User
 ```
 ##### and you can use `--force` command
 
