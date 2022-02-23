@@ -16,12 +16,24 @@ abstract class BaseRepository extends Helpers
     }
 
 
+<<<<<<< HEAD
     public function index($take = null, $skip = 0)
     {
         $data = QueryBuilder::for($this->table)
             ->allowedSorts($this->sort())
             ->allowedIncludes($this->include())
             ->allowedFilters($this->filter());
+=======
+    public function index($take = null, $skip = 0, $where = null)
+    {
+        $data = QueryBuilder::for($this->table)
+            ->allowedSorts(config("jsonapi.resources.{$this->getType()}.allowedSorts"))
+            ->allowedIncludes(config("jsonapi.resources.{$this->getType()}.allowedIncludes"))
+            ->allowedFilters(config("jsonapi.resources.{$this->getType()}.allowedFilters"));
+            if($where) {
+                $data = $data->where($where['column'], $where['condition'], $where['value']);
+            }
+>>>>>>> parent of afe3ce5 (wheres)
         return [
             'total' => $data->count(),
             'items' => ($take == null) ? $data->get() : $data->take($take)->skip($skip)->get()
