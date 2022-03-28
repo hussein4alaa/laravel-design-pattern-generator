@@ -3,7 +3,7 @@
     "description": "g4t laravel design pattern (repository design pattern With some improvements)",
     "type": "library",
     "require": {
-        "spatie/laravel-query-builder": "^5.0"
+        "spatie/laravel-query-builder": "^4.0"
     },
     "license": "MIT",
     "authors": [
